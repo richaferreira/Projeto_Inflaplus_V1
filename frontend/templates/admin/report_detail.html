@@ -1,0 +1,45 @@
+
+{% extends 'base.html' %}
+{% block title %}Admin • Denúncia #{{ r.id }} — InfraPlus{% endblock %}
+{% block content %}
+  <div class="container my-4">
+    <div class="row g-3">
+      <div class="col-lg-8">
+        <div class="card shadow-sm mb-3">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start">
+              <h2 class="h5 mb-1">#{{ r.id }} — {{ r.title }}</h2>
+              <span class="badge bg-secondary">{{ r.status }}</span>
+            </div>
+            <div class="small text-muted mb-2">{{ r.category }} • {{ r.created_at.strftime('%d/%m/%Y %H:%M') }}</div>
+            {% if r.image_filename %}
+              <img class="img-fluid rounded mb-2" src="{{ url_for('static', filename='uploads/' ~ r.image_filename) }}" alt="Imagem da denúncia">
+            {% endif %}
+            {% if r.images %}
+              <div class="row g-2 mb-2">
+                {% for img in r.images %}
+                  <div class="col-6 col-md-4">
+                    <a href="{{ url_for('static', filename='uploads/' ~ img.filename) }}" target="_blank">
+                      <img src="{{ url_for('static', filename='uploads/' ~ img.filename) }}" class="img-fluid rounded" alt="Foto adicional">
+                    </a>
+                  </div>
+                {% endfor %}
+              </div>
+            {% endif %}
+            <p class="mb-0">{{ r.description }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="card shadow-sm"><div class="card-body">
+          <h6 class="card-title">Atualizar status</h6>
+          <form method="post">
+            {{ sform.hidden_tag() }}
+            <div class="mb-2">{{ sform.status(class='form-select') }}</div>
+            <div class="d-grid">{{ sform.submit(class='btn btn-primary') }}</div>
+          </form>
+        </div></div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

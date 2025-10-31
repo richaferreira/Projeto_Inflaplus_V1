@@ -1,0 +1,71 @@
+
+{% extends 'base.html' %}
+{% block title %}Nova Denúncia — InfraPlus{% endblock %}
+{% block content %}
+  <div class="container my-4">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h2 class="h4 mb-3">Nova denúncia</h2>
+        <form method="post" enctype="multipart/form-data" novalidate>
+          {{ form.hidden_tag() }}
+          <div class="row g-3">
+            <div class="col-md-8">
+              <label class="form-label" for="{{ form.title.id }}">Título</label>
+              {{ form.title(class='form-control', placeholder='Ex.: Vazamento na rua X') }}
+              {% if form.title.errors %}<div class="text-danger small">{{ form.title.errors[0] }}</div>{% endif %}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label" for="{{ form.category.id }}">Categoria</label>
+              {{ form.category(class='form-select') }}
+            </div>
+            <div class="col-12">
+              <label class="form-label" for="{{ form.description.id }}">Descrição</label>
+              {{ form.description(class='form-control', rows=5, placeholder='Descreva o problema, horários, impacto, etc.') }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="{{ form.address.id }}">Endereço (opcional)</label>
+              {{ form.address(class='form-control', placeholder='Rua, nº, bairro, cidade') }}
+            </div>
+            <div class="col-md-3">
+              <label class="form-label" for="{{ form.latitude.id }}">Latitude</label>
+              {{ form.latitude(class='form-control', placeholder='-21.2', id='latField') }}
+            </div>
+            <div class="col-md-3">
+              <label class="form-label" for="{{ form.longitude.id }}">Longitude</label>
+              {{ form.longitude(class='form-control', placeholder='-41.9', id='lonField') }}
+            </div>
+            <div class="col-12">
+              <label class="form-label">Selecione no mapa (opcional)</label>
+              <div id="mapPicker" class="map-box"></div>
+              <div class="mt-2 d-flex gap-2">
+                <button type="button" class="btn btn-outline-primary btn-sm" id="btnUseLocation">Usar minha localização</button>
+                <span class="text-muted small">Clique no mapa para preencher latitude/longitude.</span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="{{ form.image.id }}">Foto principal (opcional)</label>
+              {{ form.image(class='form-control') }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="images">Outras fotos (múltiplas)</label>
+              <input class="form-control" type="file" id="images" name="images" multiple accept="image/*">
+              <div class="form-text">JPG, PNG ou GIF, até 20MB (somando todos os arquivos).</div>
+            </div>
+            <div class="col-12 d-grid d-md-block">
+              
+<div class="col-md-6">
+  <label class="form-label" for="{{ form.assigned_company_id.id }}">Empresa responsável na região (opcional)</label>
+  {{ form.assigned_company_id(class='form-select') }}
+</div>
+            {{ form.submit(class='btn btn-primary') }}
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  {% block scripts %}
+    <script src="{{ url_for('static', filename='js/map_picker.js') }}"></script>
+  {% endblock %}
+{% endblock %}

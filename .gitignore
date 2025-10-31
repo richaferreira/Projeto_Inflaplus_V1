@@ -1,0 +1,29 @@
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.eggs/
+.build/
+dist/
+venv/
+.venv/
+.env/
+.env.*
+*.sqlite3
+
+# IDEs/OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Project
+infra_plus.db
+migrations/versions/__pycache__/
+frontend/static/uploads/
+coverage.xml
+.htmlcov/

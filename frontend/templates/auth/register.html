@@ -1,0 +1,37 @@
+
+{% extends 'base.html' %}
+{% block title %}Cadastro — InfraPlus{% endblock %}
+{% block content %}
+  <div class="container my-4">
+    <div class="row justify-content-center">
+      <div class="col-md-7 col-lg-6">
+        <div class="card shadow-sm">
+          <div class="card-body p-4">
+            <h2 class="h4 mb-3 text-center">Criar conta</h2>
+            <form method="post" novalidate>
+              {{ form.hidden_tag() }}
+              <div class="mb-3">
+                <label class="form-label" for="{{ form.name.id }}">Nome completo</label>
+                {{ form.name(class='form-control', placeholder='Seu nome') }}
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="{{ form.email.id }}">E-mail</label>
+                {{ form.email(class='form-control', placeholder='voce@email.com') }}
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="{{ form.password.id }}">Senha</label>
+                {{ form.password(class='form-control', placeholder='Mínimo 6 caracteres') }}
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="{{ form.confirm.id }}">Confirmar senha</label>
+                {{ form.confirm(class='form-control', placeholder='Repita a senha') }}
+              </div>
+              <div class="d-grid">{{ form.submit(class='btn btn-primary') }}</div>
+              <div class="mt-3 text-center small">Já tem conta? <a href="{{ url_for('auth.login') }}">Entrar</a></div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

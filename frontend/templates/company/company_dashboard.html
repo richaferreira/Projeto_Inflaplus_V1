@@ -1,0 +1,12 @@
+
+{% extends 'base.html' %}
+{% block content %}
+    <h2>Denúncias Pendentes</h2>
+    <ul>
+        {% for report in reports %}
+            <li>
+                <a href="{{ url_for('company.respond_to_report', id=report.id) }}">{{ report.title }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

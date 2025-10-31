@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-4">
+  <h1 class="mb-3">Empresas terceirizadas</h1>
+  <a href="{{ url_for('admin.companies_new') }}" class="btn btn-primary mb-3">Nova empresa</a>
+  {% if companies %}
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Nome</th><th>CNPJ</th><th>Telefone</th><th>E-mail</th><th>Endereço</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in companies %}
+      <tr>
+        <td>{{ c.name }}</td>
+        <td>{{ c.cnpj }}</td>
+        <td>{{ c.phone or '-' }}</td>
+        <td>{{ c.email or '-' }}</td>
+        <td>{{ c.address or '-' }}</td>
+        <td>
+          <form method="post" action="{{ url_for('admin.companies_delete', company_id=c.id) }}" onsubmit="return confirm('Excluir {{ c.name }}?');">
+            {{ csrf_token() }}
+            <button class="btn btn-sm btn-outline-danger">Excluir</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% include 'shared/_pagination.html' %}
+  {% else %}
+  <p>Nenhuma empresa cadastrada.</p>
+  {% endif %}
+</div>
+{% endblock %}

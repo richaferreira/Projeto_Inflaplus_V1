@@ -1,0 +1,29 @@
+
+{% extends 'base.html' %}
+{% block title %}Login — InfraPlus{% endblock %}
+{% block content %}
+  <div class="container my-4">
+    <div class="row justify-content-center">
+      <div class="col-md-6 col-lg-5">
+        <div class="card shadow-sm">
+          <div class="card-body p-4">
+            <h2 class="h4 mb-3 text-center">Acessar conta</h2>
+            <form method="post" novalidate>
+              {{ form.hidden_tag() }}
+              <div class="mb-3">
+                <label class="form-label" for="{{ form.email.id }}">E-mail</label>
+                {{ form.email(class='form-control', placeholder='seu@email.com') }}
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="{{ form.password.id }}">Senha</label>
+                {{ form.password(class='form-control', placeholder='••••••') }}
+              </div>
+              <div class="d-grid">{{ form.submit(class='btn btn-primary') }}</div>
+              <div class="mt-3 text-center small">Não tem conta? <a href="{{ url_for('auth.register') }}">Cadastre-se</a></div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,11 @@
+
+{% extends 'base.html' %}
+{% block content %}
+    <h2>Denúncia: {{ report.title }}</h2>
+    <p>{{ report.description }}</p>
+
+    <form method="POST">
+        <textarea name="response" rows="4" placeholder="Sua resposta..."></textarea>
+        <button type="submit">Enviar Resposta</button>
+    </form>
+{% endblock %}

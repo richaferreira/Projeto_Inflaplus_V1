@@ -1,0 +1,126 @@
+
+{% extends 'base.html' %}
+{% block title %}Admin — InfraPlus{% endblock %}
+{% block content %}
+  <div class="container my-4">
+    <h2 class="h4 mb-3">Painel administrativo</h2>
+<div class="mb-3">
+  <a class="btn btn-outline-primary" href="{{ url_for('admin.companies_list') }}">Empresas terceirizadas</a>
+</div>
+
+    <div class="row g-3 mb-3">
+      <div class="col-md-3"><div class="card shadow-sm h-100"><div class="card-body">
+        <div class="text-muted small">Total de denúncias (geral)</div>
+        <div class="display-6">{{ stats.total }}</div>
+      </div></div></div>
+      <div class="col-md-3"><div class="card shadow-sm h-100"><div class="card-body">
+        <div class="text-muted small">Abertas</div>
+        <div class="h2 mb-0">{{ stats.by_status.get('Aberta', 0) }}</div>
+      </div></div></div>
+      <div class="col-md-3"><div class="card shadow-sm h-100"><div class="card-body">
+        <div class="text-muted small">Em andamento</div>
+        <div class="h2 mb-0">{{ stats.by_status.get('Em andamento', 0) }}</div>
+      </div></div></div>
+      <div class="col-md-3"><div class="card shadow-sm h-100"><div class="card-body">
+        <div class="text-muted small">Resolvidas</div>
+        <div class="h2 mb-0">{{ stats.by_status.get('Resolvida', 0) }}</div>
+      </div></div></div>
+    </div>
+
+    <div class="row g-3 mb-4">
+      <div class="col-lg-6">
+        <div class="card shadow-sm h-100"><div class="card-body">
+          <h6 class="card-title">Denúncias por dia (7d)</h6>
+          <canvas id="chart7d" height="150"></canvas>
+        </div></div>
+      </div>
+      <div class="col-lg-6">
+        <div class="card shadow-sm h-100"><div class="card-body">
+          <h6 class="card-title">Distribuição por categoria</h6>
+          <canvas id="chartCategory" height="150"></canvas>
+        </div></div>
+      </div>
+    </div>
+
+    <form class="card card-body shadow-sm mb-2" method="get">
+      <div class="row g-2 align-items-end">
+        <div class="col-md-3">
+          <label class="form-label">Categoria</label>
+          <select class="form-select" name="categoria">
+            <option value="">Todas</option>
+            {% for c in ['Vazamento','Falta de água','Água suja','Outros'] %}
+              <option value="{{ c }}" {% if request.args.get('categoria')==c %}selected{% endif %}>{{ c }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Status</label>
+          <select class="form-select" name="status">
+            <option value="">Todos</option>
+            {% for s in ['Aberta','Em andamento','Resolvida'] %}
+              <option value="{{ s }}" {% if request.args.get('status')==s %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label">De</label>
+          <input type="date" class="form-control" name="de" value="{{ request.args.get('de','') }}">
+        </div>
+        <div class="col-md-2">
+          <label class="form-label">Até</label>
+          <input type="date" class="form-control" name="ate" value="{{ request.args.get('ate','') }}">
+        </div>
+        <div class="col-md-2 d-grid"><button class="btn btn-primary">Filtrar</button></div>
+      </div>
+    </form>
+
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <h6 class="mb-0">Denúncias ({{ total }})</h6>
+      <div class="d-flex gap-2">
+        <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('admin.export_csv') }}">Exportar CSV</a>
+      </div>
+    </div>
+
+    <div class="table-responsive bg-white shadow-sm rounded">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>#</th><th>Título</th><th>Categoria</th><th>Status</th><th>Criado em</th><th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in reports %}
+            <tr>
+              <td>{{ r.id }}</td>
+              <td>{{ r.title }}</td>
+              <td>{{ r.category }}</td>
+              <td><span class="badge bg-secondary">{{ r.status }}</span></td>
+              <td>{{ r.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+              <td class="text-end">
+                <a class="btn btn-sm btn-outline-primary" href="{{ url_for('admin.report_manage', report_id=r.id) }}">Gerenciar</a>
+                <form method="post" action="{{ url_for('admin.report_delete', report_id=r.id) }}" style="display:inline" onsubmit="return confirm('Remover denúncia #{{ r.id }}?');">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button class="btn btn-sm btn-outline-danger">Remover</button>
+                </form>
+              </td>
+            </tr>
+          {% else %}
+            <tr><td colspan="6" class="text-center text-muted">Sem denúncias.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% include 'shared/_pagination.html' %}
+  </div>
+
+  {% block scripts %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script>
+      window.__DAYS = {{ stats.days | tojson }};
+      window.__SERIES7 = {{ stats.series7 | tojson }};
+      window.__BY_CATEGORY = {{ stats.by_category | tojson }};
+    </script>
+    <script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+  {% endblock %}
+{% endblock %}

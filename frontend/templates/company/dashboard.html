@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+  <h1 class="h3 mb-4">Painel da Empresa</h1>
+
+  <!-- KPIs / Charts -->
+  <div class="row g-3 mb-4">
+    <div class="col-12 col-md-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <h6 class="text-muted mb-2">Total de Denúncias</h6>
+          <div class="display-5 fw-bold">{{ total or 0 }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-md-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <h6 class="text-muted mb-2">Por Status</h6>
+          <canvas id="chartStatus"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-md-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <h6 class="text-muted mb-2">Por Categoria</h6>
+          <canvas id="chartCategory"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lista de denúncias da empresa -->
+  <div class="card">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6 class="text-muted mb-0">Denúncias da minha empresa</h6>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead>
+            <tr>
+              <th style="width: 80px;">ID</th>
+              <th>Título</th>
+              <th style="width: 160px;">Categoria</th>
+              <th style="width: 140px;">Status</th>
+              <th style="width: 180px;">Criada em</th>
+              <th style="width: 150px;">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in reports %}
+            <tr>
+              <td>#{{ r.id }}</td>
+              <td>
+                <a href="{{ url_for('company.report_detail', report_id=r.id) }}">
+                  {{ r.title or '(sem título)' }}
+                </a>
+              </td>
+              <td>{{ r.category or '—' }}</td>
+              <td>
+                <span class="badge bg-secondary">{{ r.status or '—' }}</span>
+              </td>
+              <td>
+                {% if r.created_at %}{{ r.created_at.strftime('%d/%m/%Y %H:%M') }}{% else %}—{% endif %}
+              </td>
+              <td class="text-nowrap">
+                <a class="btn btn-sm btn-primary" href="{{ url_for('company.report_detail', report_id=r.id) }}">Ver / Responder</a>
+              </td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="6" class="text-center text-muted py-4">
+                Nenhuma denúncia atribuída à sua empresa ainda.
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script>
+<script>
+(function () {
+  const byStatus = {{ (by_status or {})|tojson|safe }};
+  const byCategory = {{ (by_category or {})|tojson|safe }};
+
+  const ctxS = document.getElementById('chartStatus');
+  if (ctxS) new Chart(ctxS, {
+    type: 'doughnut',
+    data: { labels: Object.keys(byStatus), datasets: [{ data: Object.values(byStatus) }] }
+  });
+
+  const ctxC = document.getElementById('chartCategory');
+  if (ctxC) new Chart(ctxC, {
+    type: 'doughnut',
+    data: { labels: Object.keys(byCategory), datasets: [{ data: Object.values(byCategory) }] }
+  });
+})();
+</script>
+{% endblock %}

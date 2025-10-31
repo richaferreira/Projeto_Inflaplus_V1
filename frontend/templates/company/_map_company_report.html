@@ -1,0 +1,82 @@
+{# company/_map_company_report.html
+   Leaflet + OpenStreetMap map for a single report.
+   Expects in context: report (with .id and .latitude/.longitude or .lat/.lng)
+   Optional: lat, lng, zoom, map_id
+#}
+
+{%- set _has_report = report is defined -%}
+{%- set _rid = (report.id if _has_report and (report.id is defined) else 'x') -%}
+{%- set map_id = map_id|default('map-report-' ~ _rid) -%}
+{%- set _lat = (lat if (lat is defined) else (report.latitude if _has_report and (report.latitude is defined) else (report.lat if _has_report and (report.lat is defined) else ''))) -%}
+{%- set _lng = (lng if (lng is defined) else (report.longitude if _has_report and (report.longitude is defined) else (report.lng if _has_report and (report.lng is defined) else ''))) -%}
+{%- set _zoom = zoom|default(16) -%}
+
+<div id="{{ map_id }}" class="leaflet-map-container"
+     data-lat="{{ _lat }}"
+     data-lng="{{ _lng }}"
+     data-zoom="{{ _zoom }}"
+     style="height: 340px; border-radius: .5rem; background: #f5f7fb;">
+  <noscript>Ative o JavaScript para ver o mapa.</noscript>
+</div>
+
+<script>
+(function() {
+  var el = document.getElementById({{ map_id|tojson }});
+  if (!el) return;
+
+  var lat = parseFloat(el.dataset.lat);
+  var lng = parseFloat(el.dataset.lng);
+  var zoom = parseInt(el.dataset.zoom || "16");
+
+  if (isNaN(lat) || isNaN(lng)) {
+    el.innerHTML = '<div style="padding:1rem;color:#6b7280;">Coordenadas ausentes ou inválidas.</div>';
+    return;
+  }
+
+  function ensureLeaflet(cb) {
+    if (window.L && typeof window.L.map === "function") { cb(); return; }
+
+    // CSS only once
+    if (!document.getElementById("leaflet-css")) {
+      var link = document.createElement("link");
+      link.id = "leaflet-css";
+      link.rel = "stylesheet";
+      link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+      document.head.appendChild(link);
+    }
+
+    // JS only once
+    if (!document.getElementById("leaflet-js")) {
+      var script = document.createElement("script");
+      script.id = "leaflet-js";
+      script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+      script.onload = cb;
+      document.body.appendChild(script);
+    } else {
+      // If already present but not loaded yet
+      var s = document.getElementById("leaflet-js");
+      if (s.dataset.loaded === "1") cb();
+      else s.addEventListener("load", cb, { once: true });
+    }
+  }
+
+  function init() {
+    try {
+      var map = L.map(el).setView([lat, lng], zoom);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+      }).addTo(map);
+
+      var marker = L.marker([lat, lng]).addTo(map);
+      // Improve rendering in tabs/hidden containers
+      setTimeout(function(){ map.invalidateSize(); }, 200);
+    } catch (e) {
+      el.innerHTML = '<div style="padding:1rem;color:#b91c1c;">Erro ao inicializar o mapa.</div>';
+      console.error(e);
+    }
+  }
+
+  ensureLeaflet(init);
+})();
+</script>
