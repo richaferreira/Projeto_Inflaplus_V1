@@ -8,7 +8,7 @@ PROJECT_ROOT = os.path.abspath(os.path.join(BACKEND_DIR, '..', '..'))
 FRONTEND_DIR = os.path.join(PROJECT_ROOT, 'frontend')
 
 class Config:
-    SECRET_KEY = os.environ.get('SECRET_KEY', 'troque-por-um-valor-bem-aleatorio-e-seguro')
+    SECRET_KEY = os.environ.get('Infraplus2025')
     WTF_CSRF_TIME_LIMIT = None
 
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', f"sqlite:///{os.path.join(PROJECT_ROOT, 'infra_plus.db')}")
